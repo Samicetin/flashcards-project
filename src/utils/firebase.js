@@ -1,15 +1,14 @@
-// Firebase configuration and initialization
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDP4qE7mzx66FuKJpSEYhzCJZFl--wCKYI",
+  authDomain: "quizwebsite-a65fc.firebaseapp.com",
+  projectId: "quizwebsite-a65fc",
+  storageBucket: "quizwebsite-a65fc.firebasestorage.app",
+  messagingSenderId: "434896288333",
+  appId: "1:434896288333:web:740673b4339703acfd3a04"
 };
 
 const app = initializeApp(firebaseConfig);
