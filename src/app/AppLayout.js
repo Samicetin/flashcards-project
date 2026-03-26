@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import Auth from "../components/Auth";
 import { Outlet, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import ROUTES from "./routes";
@@ -7,6 +8,7 @@ import { selectHasResults } from "../features/results/resultsSlice";
 
 export default function AppLayout() {
     const hasResults = useSelector(selectHasResults);
+    const [user, setUser] = useState(null);
 
     return (
         <div>
@@ -47,10 +49,15 @@ export default function AppLayout() {
                   </li>
                 )}
                 </ul>
+                <div style={{ float: "right" }}>
+                  {user ? (
+                    <span>Signed in as: {user.username || user.email}</span>
+                  ) : (
+                    <Auth onAuth={setUser} />
+                  )}
+                </div>
             </nav>
             <Outlet/>
         </div>
-      
-
     );
 }

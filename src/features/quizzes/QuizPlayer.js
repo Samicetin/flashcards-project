@@ -5,8 +5,10 @@ import { useNavigate } from "react-router-dom";
 import ROUTES from "../../app/routes";
 import { selectCards } from "../cards/cardsSlice";
 import { addAttempt } from "../results/resultsSlice";
+import { saveUserScore } from "../results/userScores";
 
-export default function QuizPlayer({ quiz, onExit }) {
+// Accept user prop for saving scores
+export default function QuizPlayer({ quiz, onExit, user }) {
   const cards = useSelector(selectCards);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -27,6 +29,10 @@ export default function QuizPlayer({ quiz, onExit }) {
   useEffect(() => {
     if (quizComplete) {
       dispatch(addAttempt({ quizId: quiz.id, score, total: totalCards }));
+      // Save user score to Firestore if user is signed in
+      if (user && user.uid) {
+        saveUserScore({ userId: user.uid, quizId: quiz.id, score, total: totalCards });
+      }
       if (score === totalCards && totalCards > 0) {
         setShowConfetti(true);
         playSound("/sounds/crowd.mp3");
@@ -36,7 +42,7 @@ export default function QuizPlayer({ quiz, onExit }) {
         playSound("/sounds/goat.mp3");
       }
     }
-  }, [quizComplete, dispatch, quiz.id, score, totalCards]);
+  }, [quizComplete, dispatch, quiz.id, score, totalCards, user]);
 
   if (cardIds.length === 0) {
     return (

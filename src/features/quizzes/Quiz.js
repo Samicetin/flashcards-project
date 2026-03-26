@@ -4,6 +4,7 @@ import { Link, useParams, Navigate, useNavigate, useLocation } from "react-route
 import Card from "../cards/Card";
 import QuizPlayer from "./QuizPlayer";
 import EditQuizForm from "./EditQuizForm";
+import Leaderboard from "../results/Leaderboard";
 import ROUTES from "../../app/routes";
 import { selectQuizzes, removeQuiz } from "./quizzesSlice";
 import { removeQuizIdFromTopic } from "../topics/topicsSlice";
@@ -67,6 +68,7 @@ export default function Quiz() {
           <Card key={id} id={id} />
         ))}
       </ul>
+      <Leaderboard quizId={quiz.id} />
       <Link to={ROUTES.newQuizRoute()} className="button center">
         Create a New Quiz
       </Link>
