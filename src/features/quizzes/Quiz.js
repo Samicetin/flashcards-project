@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, useParams, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { Link, useParams, Navigate, useNavigate, useLocation, useOutletContext } from "react-router-dom";
 import Card from "../cards/Card";
 import QuizPlayer from "./QuizPlayer";
 import EditQuizForm from "./EditQuizForm";
@@ -12,6 +12,7 @@ import { removeCard } from "../cards/cardsSlice";
 
 export default function Quiz() {
   const quizzes = useSelector(selectQuizzes);
+  const { user } = useOutletContext();
   const { quizId } = useParams();
   const quiz = quizzes[quizId];
   const dispatch = useDispatch();
@@ -41,7 +42,7 @@ export default function Quiz() {
   if (isPlaying) {
     return (
       <section style={{ padding: 0 }}>
-        <QuizPlayer quiz={quiz} onExit={() => setIsPlaying(false)} />
+        <QuizPlayer quiz={quiz} onExit={() => setIsPlaying(false)} user={user} />
       </section>
     );
   }

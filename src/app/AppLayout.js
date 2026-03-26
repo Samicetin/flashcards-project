@@ -57,7 +57,7 @@ export default function AppLayout() {
                   )}
                 </div>
             </nav>
-            <Outlet/>
+            <Outlet context={{ user }} />
         </div>
     );
 }
