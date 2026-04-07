@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from "uuid";
 import ROUTES from "../../app/routes";
 import { selectCards, addCard, updateCard, removeCard } from "../cards/cardsSlice";
 import { updateQuizCardIds } from "./quizzesSlice";
+import { saveCardToFirestore, deleteCardFromFirestore } from "../cards/firestoreCards";
+import { saveQuizToFirestore } from "./firestoreQuizzes";
 
 export default function EditQuizForm({ quiz, onCancel }) {
   const cardsState = useSelector(selectCards);
@@ -26,13 +28,14 @@ export default function EditQuizForm({ quiz, onCancel }) {
     setCards(cards.concat({ id: null, front: "", back: "", isNew: true }));
   };
 
-  const handleRemoveCard = (e, index) => {
+  const handleRemoveCard = async (e, index) => {
     e.preventDefault();
     const cardToRemove = cards[index];
     
     // Only dispatch removeCard if it's an existing card (not new)
     if (!cardToRemove.isNew && cardToRemove.id) {
       dispatch(removeCard({ id: cardToRemove.id }));
+      await deleteCardFromFirestore(cardToRemove.id);
     }
     
     setCards(cards.filter((card, i) => index !== i));
@@ -44,31 +47,36 @@ export default function EditQuizForm({ quiz, onCancel }) {
     setCards(newCards);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const cardIds = [];
 
     // Process all cards
-    cards.forEach((card) => {
+    for (const card of cards) {
       if (card.front.trim().length === 0 || card.back.trim().length === 0) {
-        return; // Skip empty cards
+        continue; // Skip empty cards
       }
 
       if (card.isNew) {
         // Add new cards
         const cardId = uuidv4();
         cardIds.push(cardId);
-        dispatch(addCard({ id: cardId, front: card.front, back: card.back }));
+        const newCard = { id: cardId, front: card.front, back: card.back };
+        dispatch(addCard(newCard));
+        await saveCardToFirestore(newCard);
       } else {
         // Update existing cards
         cardIds.push(card.id);
-        dispatch(updateCard({ id: card.id, front: card.front, back: card.back }));
+        const updatedCard = { id: card.id, front: card.front, back: card.back };
+        dispatch(updateCard(updatedCard));
+        await saveCardToFirestore(updatedCard);
       }
-    });
+    }
 
     // Update quiz with new cardIds
     dispatch(updateQuizCardIds({ id: quiz.id, cardIds }));
+    await saveQuizToFirestore({ ...quiz, cardIds });
 
     navigate(ROUTES.quizzesRoute());
   };

@@ -7,12 +7,12 @@ export const topicsSlice = createSlice({
     },
     reducers: {
         addTopic: (state, action) => {
-            const { id, name, icon } = action.payload
+            const { id, name, icon, quizIds } = action.payload
             state.topics[id] = {
                 id,
                 name,
                 icon,
-                quizIds: []
+                quizIds: Array.isArray(quizIds) ? quizIds : []
             }
         },
         addQuizIdToTopic: (state, action) => {

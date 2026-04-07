@@ -31,7 +31,14 @@ export default function QuizPlayer({ quiz, onExit, user }) {
       dispatch(addAttempt({ quizId: quiz.id, score, total: totalCards }));
       // Save user score to Firestore if user is signed in
       if (user && user.uid) {
-        saveUserScore({ userId: user.uid, quizId: quiz.id, score, total: totalCards });
+        saveUserScore({
+          userId: user.uid,
+          quizId: quiz.id,
+          score,
+          total: totalCards,
+          username: user.username,
+          email: user.email,
+        });
       }
       if (score === totalCards && totalCards > 0) {
         setShowConfetti(true);

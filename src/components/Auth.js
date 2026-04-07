@@ -22,6 +22,7 @@ export default function Auth({ onAuth }) {
       }
     } catch (err) {
       setError("Google sign-in failed");
+      console.error("Google sign-in error:", err);
     }
   };
 
@@ -32,8 +33,13 @@ export default function Auth({ onAuth }) {
     const user = auth.currentUser;
     if (!user) return setError("Not signed in");
     const userRef = doc(db, "users", user.uid);
-    await setDoc(userRef, { username, email: user.email }, { merge: true });
-    onAuth({ username, email: user.email, uid: user.uid });
+    try {
+      await setDoc(userRef, { username, email: user.email }, { merge: true });
+      onAuth({ username, email: user.email, uid: user.uid });
+    } catch (err) {
+      setError("Failed to save username");
+      console.error("Firestore setDoc error:", err);
+    }
   };
 
   return (

@@ -1,17 +1,36 @@
 import { db } from "../../utils/firebase";
-import { doc, setDoc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { collection, doc, getDocs, limit, orderBy, query, setDoc, where } from "firebase/firestore";
 
-// Save or update user score for a quiz
-export async function saveUserScore({ userId, quizId, score, total }) {
-  if (!userId) return;
+// Save or update a user's score for a quiz.
+export async function saveUserScore({ userId, quizId, score, total, username, email }) {
+  if (!userId || !quizId) return;
+
   const userScoreRef = doc(db, "userScores", `${userId}_${quizId}`);
-  await setDoc(userScoreRef, { userId, quizId, score, total, updated: new Date().toISOString() }, { merge: true });
+  await setDoc(
+    userScoreRef,
+    {
+      userId,
+      quizId,
+      score,
+      total,
+      username: username || null,
+      email: email || null,
+      updated: new Date().toISOString(),
+    },
+    { merge: true }
+  );
 }
 
-// Get all user scores for leaderboard
 export async function getLeaderboard(quizId) {
-  // This is a placeholder; actual implementation should use Firestore queries
-  // to fetch and sort top scores for the quizId
-  // Example: query(collection(db, "userScores"), where("quizId", "==", quizId), orderBy("score", "desc"), limit(10))
-  return [];
+  if (!quizId) return [];
+
+  const q = query(
+    collection(db, "userScores"),
+    where("quizId", "==", quizId),
+    orderBy("score", "desc"),
+    limit(50)
+  );
+
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((item) => item.data());
 }

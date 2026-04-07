@@ -1,12 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import ROUTES from "../app/routes";
 // import selectors
-import { selectTopics, addQuizIdToTopic } from "../features/topics/topicsSlice";
+import { selectTopics, addQuizIdToTopic, addTopic } from "../features/topics/topicsSlice";
 import { addQuiz } from "../features/quizzes/quizzesSlice";
+import { saveQuizToFirestore } from "../features/quizzes/firestoreQuizzes";
 import { addCard } from "../features/cards/cardsSlice";
+import { saveCardToFirestore } from "../features/cards/firestoreCards";
+import { getAllTopicsFromFirestore, saveTopicToFirestore } from "../features/topics/firestoreTopics";
+import { auth } from "../utils/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function NewQuizForm() {
   const [name, setName] = useState("");
@@ -16,25 +21,53 @@ export default function NewQuizForm() {
   const topics = useSelector(selectTopics);
   const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user || Object.keys(topics).length > 0) {
+        return;
+      }
+
+      try {
+        const topicsFromDb = await getAllTopicsFromFirestore();
+        Object.values(topicsFromDb).forEach((topic) => {
+          dispatch(addTopic(topic));
+        });
+      } catch (error) {
+        if (error?.code !== "permission-denied") {
+          console.error("Failed to load topics for new quiz form:", error);
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [dispatch, topics]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (name.length === 0) {
+    if (name.length === 0 || !topicId || !topics[topicId]) {
       return;
     }
 
     const cardIds = [];
 
     // create the new cards here and add each card's id to cardIds
-    cards.forEach((card) => {
+    for (const card of cards) {
       const cardId = uuidv4();
       cardIds.push(cardId);
-      dispatch(addCard({ id: cardId, front: card.front, back: card.back }));
-    });
+      const cardObj = { id: cardId, front: card.front, back: card.back };
+      dispatch(addCard(cardObj));
+      await saveCardToFirestore(cardObj);
+    }
 
     const quizId = uuidv4();
     // dispatch add quiz action
-    dispatch(addQuiz({ id: quizId, name, topicId, cardIds }));
-    dispatch(addQuizIdToTopic({ id: quizId, name, topicId, cardIds }));
+    const quizObj = { id: quizId, name, topicId, cardIds };
+    dispatch(addQuiz(quizObj));
+    dispatch(addQuizIdToTopic({ id: quizId, topicId }));
+    await saveQuizToFirestore(quizObj);
+
+    const nextQuizIds = [...(topics[topicId].quizIds || []), quizId];
+    await saveTopicToFirestore({ ...topics[topicId], quizIds: nextQuizIds });
 
     navigate(ROUTES.quizRoute(quizId), { state: { editing: true } })
   };
@@ -56,9 +89,13 @@ export default function NewQuizForm() {
   };
 
   return (
-    <section>
-      <h1>Create a new quiz</h1>
-      <form onSubmit={handleSubmit}>
+    <section className="page-section">
+      <header className="page-header center">
+        <h1>Create a new quiz</h1>
+        <p className="page-subtitle">Add quiz details, choose a topic, and build your card set.</p>
+      </header>
+
+      <form onSubmit={handleSubmit} className="modern-form">
         <input
           id="quiz-name"
           value={name}
@@ -69,6 +106,8 @@ export default function NewQuizForm() {
           id="quiz-topic"
           onChange={(e) => setTopicId(e.currentTarget.value)}
           placeholder="Topic"
+          required
+          value={topicId}
         >
           <option value="">Topic</option>
           {Object.values(topics).map((topic) => (
@@ -77,37 +116,44 @@ export default function NewQuizForm() {
             </option>
           ))}
         </select>
-        {cards.map((card, index) => (
-          <div key={index} className="card-front-back" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-            <input
-              id={`card-front-${index}`}
-              value={cards[index].front}
-              onChange={(e) =>
-                updateCardState(index, "front", e.currentTarget.value)
-              }
-              placeholder="Question"
-            />
-            <input
-              id={`card-back-${index}`}
-              value={cards[index].back}
-              onChange={(e) =>
-                updateCardState(index, "back", e.currentTarget.value)
-              }
-              placeholder="Answer"
-            />
-            <button
-              onClick={(e) => removeCard(e, index)}
-              className="remove-card-button"
-              style={{ margin: '0 auto', position: 'static', right: 'unset', top: 'unset' }}
-            >
-              Remove Card
-            </button>
-          </div>
-        ))}
-        <div className="actions-container">
+        <div className="new-quiz-cards">
+          {cards.map((card, index) => (
+            <div key={index} className="card-front-back modern-card-inputs">
+              <p className="card-index">Card {index + 1}</p>
+              <input
+                id={`card-front-${index}`}
+                value={cards[index].front}
+                onChange={(e) =>
+                  updateCardState(index, "front", e.currentTarget.value)
+                }
+                placeholder="Question"
+              />
+              <input
+                id={`card-back-${index}`}
+                value={cards[index].back}
+                onChange={(e) =>
+                  updateCardState(index, "back", e.currentTarget.value)
+                }
+                placeholder="Answer"
+              />
+              <button
+                onClick={(e) => removeCard(e, index)}
+                className="remove-card-button"
+              >
+                Remove Card
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className="actions-container modern-actions">
           <button onClick={addCardInputs}>Add a Card</button>
           <button type="submit">Create Quiz</button>
         </div>
+
+        {cards.length === 0 && (
+          <p className="form-help-text">Start by adding at least one card.</p>
+        )}
       </form>
     </section>
   );

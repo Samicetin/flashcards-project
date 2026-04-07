@@ -1,7 +1,8 @@
 import React from "react";
 import {
+  Navigate,
   Route,
-  BrowserRouter,
+  HashRouter,
   Routes
 } from "react-router-dom";
 import NewQuizForm from "../components/NewQuizForm";
@@ -15,9 +16,15 @@ import AppLayout from "./AppLayout";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       <Routes>
       <Route path="/" element={<AppLayout/>}>
+    <Route index element={<Navigate to="topics" replace />} />
     <Route path="topics" element={<Topics/>}/>
     <Route path="topics/new" element={<NewTopicForm/>}/>
     <Route path="topics/:topicId" element={<Topic/>}/>
@@ -27,6 +34,6 @@ export default function App() {
     <Route path="results" element={<Results/>}/>
   </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   )
 }

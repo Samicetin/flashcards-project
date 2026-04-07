@@ -7,11 +7,15 @@ import EditQuizForm from "./EditQuizForm";
 import Leaderboard from "../results/Leaderboard";
 import ROUTES from "../../app/routes";
 import { selectQuizzes, removeQuiz } from "./quizzesSlice";
-import { removeQuizIdFromTopic } from "../topics/topicsSlice";
+import { removeQuizIdFromTopic, selectTopics } from "../topics/topicsSlice";
 import { removeCard } from "../cards/cardsSlice";
+import { deleteCardFromFirestore } from "../cards/firestoreCards";
+import { deleteQuizFromFirestore } from "./firestoreQuizzes";
+import { saveTopicToFirestore } from "../topics/firestoreTopics";
 
 export default function Quiz() {
   const quizzes = useSelector(selectQuizzes);
+  const topics = useSelector(selectTopics);
   const { user } = useOutletContext();
   const { quizId } = useParams();
   const quiz = quizzes[quizId];
@@ -25,17 +29,23 @@ export default function Quiz() {
     return <Navigate to={ROUTES.quizzesRoute()} replace/>
   }
 
-  const handleDeleteQuiz = () => {
+  const handleDeleteQuiz = async () => {
     // Remove all cards associated with this quiz
     if (quiz.cardIds) {
-      quiz.cardIds.forEach((cardId) => {
+      for (const cardId of quiz.cardIds) {
         dispatch(removeCard({ id: cardId }));
-      });
+        await deleteCardFromFirestore(cardId);
+      }
     }
     // Remove quiz from topic
     dispatch(removeQuizIdFromTopic({ id: quizId, topicId: quiz.topicId }));
+    if (quiz.topicId && topics[quiz.topicId]) {
+      const nextQuizIds = (topics[quiz.topicId].quizIds || []).filter((id) => id !== quizId);
+      await saveTopicToFirestore({ ...topics[quiz.topicId], quizIds: nextQuizIds });
+    }
     // Remove quiz itself
     dispatch(removeQuiz({ id: quizId }));
+    await deleteQuizFromFirestore(quizId);
     navigate(ROUTES.quizzesRoute());
   };
 

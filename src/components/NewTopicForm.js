@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import ROUTES from "../app/routes";
 import { ALL_ICONS } from "../data/icons";
 import { addTopic } from "../features/topics/topicsSlice";
+import { saveTopicToFirestore } from "../features/topics/firestoreTopics";
 
 export default function NewTopicForm() {
   const dispatch = useDispatch();
@@ -12,13 +13,15 @@ export default function NewTopicForm() {
   const [icon, setIcon] = useState("");
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (name.length === 0) {
       return;
     }
 
-    dispatch(addTopic({ id: uuidv4(), name, icon }));
+    const topic = { id: uuidv4(), name, icon, quizIds: [] };
+    dispatch(addTopic(topic));
+    await saveTopicToFirestore(topic);
     navigate(ROUTES.topicsRoute());
   };
 

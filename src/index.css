@@ -23,121 +23,122 @@
 html,
 body {
   margin: 0;
+  background: #f4f4f4;
+  color: #111111;
 }
 
-nav {
-  background-image: url("https://motionarray.imgix.net/1967640-oH6JklTSez-high_0005.jpg?w=660&q=60&fit=max&auto=format");
-  background-size: 200px 200px;
-  background-repeat: repeat;
+.app-shell {
+  min-height: 100vh;
+}
+
+.menu-toggle {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  width: 52px;
+  height: 52px;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  background: #ffffff;
   display: flex;
   flex-direction: column;
-  padding: 24px 36px;
-  perspective: 1000px;
-  box-shadow: 
-    0 10px 20px rgba(0, 0, 0, 0.2),
-    0 15px 25px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transform: translateY(2px);
-  border-bottom: 3px solid rgba(0, 0, 0, 0.1);
-  animation: scroll 10s linear infinite;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px;
+  z-index: 1200;
 }
 
-nav .nav-heading {
-  color: #ffffff;
-  margin: 0 0 24px 0;
-  font-size: 32px;
-  font-weight: bold;
-  text-align: center;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-nav ul {
-  display: flex;
-  justify-content: space-around;
+.menu-toggle span {
+  display: block;
   width: 100%;
-  padding: 0;
-  margin: 0;
-  list-style: none;
+  height: 2px;
+  background: #000000;
 }
 
-nav ul li {
-  margin-bottom: 0 !important;
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  border: none;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1090;
 }
 
-nav a {
-  color: rgb(255, 255, 255);
-  font-size: 16px;
-  text-decoration: none;
-  transition: all 0.1s ease;
-  display: inline-block;
-}
-
-nav a:hover {
-  animation: flash 0.6s infinite;
-}
-
-@keyframes flash {
-  0%, 100% {
-    color: #ffffff;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-  }
-  50% {
-    color: #03a8d8;
-    text-shadow: 0 0 10px rgba(3, 168, 216, 0.8);
-  }
-}
-
-nav a.active {
-  font-size: larger;
-  font-weight: bold;
-  color: #ffffff;
-}
-
-.animated-background {
+.sidebar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: -1;
-  overflow: hidden;
+  width: min(280px, 80vw);
+  height: 100vh;
+  background: #0f0f0f;
+  color: #ffffff;
+  border-right: 1px solid #2b2b2b;
+  padding: 90px 24px 24px;
+  z-index: 1100;
+  transform: translateX(-100%);
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
-.falling-mark {
-  position: absolute;
-  font-size: 48px;
-  color: rgba(3, 168, 216, 0.3);
-  animation: fall linear infinite;
-  user-select: none;
+.sidebar.open {
+  transform: translateX(0);
 }
 
-@keyframes fall {
-  0% {
-    top: -50px;
-    transform: translateX(0) rotate(0deg);
-  }
-  100% {
-    top: 100vh;
-    transform: translateX(20px) rotate(360deg);
-  }
+.sidebar .nav-heading {
+  color: #ffffff;
+  margin: 0 0 24px 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
 }
 
-@keyframes spin {
-  0% {
-    transform: translateY(2px) rotate(0deg);
-  }
-  100% {
-    transform: translateY(2px) rotate(360deg);
-  }
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-@keyframes scroll {
-  0% {
-    background-position: 0 0;
+.sidebar ul li {
+  margin-bottom: 12px;
+}
+
+.sidebar a {
+  color: #f1f1f1;
+  text-decoration: none;
+  display: block;
+  border: 1px solid #2f2f2f;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 15px;
+}
+
+.sidebar a.active {
+  background: #ffffff;
+  color: #111111;
+  border-color: #ffffff;
+  font-weight: 700;
+}
+
+.auth-panel {
+  margin-top: auto;
+  border-top: 1px solid #2f2f2f;
+  padding-top: 16px;
+  color: #e4e4e4;
+  font-size: 13px;
+}
+
+.app-content {
+  padding-top: 20px;
+}
+
+@media (min-width: 900px) {
+  .menu-toggle {
+    left: 26px;
+    top: 24px;
   }
-  100% {
-    background-position: 200px 200px;
+
+  .app-content {
+    padding-left: 0;
   }
 }
 
@@ -698,7 +699,6 @@ li:not(:last-child) {
   font-weight: bold;
   font-size: 16px;
   margin: 15px 0;
-  animation: fadeIn 0.3s ease;
 }
 
 .feedback-correct {
@@ -717,15 +717,6 @@ li:not(:last-child) {
   margin: 0;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 .confetti-wrapper {
   position: absolute;
   inset: 0;
@@ -741,17 +732,416 @@ li:not(:last-child) {
   opacity: .9;
   left: calc(var(--x) * 1%);
   top: calc(var(--y) * 1%);
-  transform: translate3d(0,0,0) rotate(calc(var(--rot) * 1deg));
-  animation: confetti-fall var(--duration, 2s) ease-out var(--delay, 0s) forwards;
+  transform: translate3d(0, 0, 0) rotate(calc(var(--rot) * 1deg));
 }
 
-@keyframes confetti-fall {
-  0% {
-    transform: translate3d(0, 0, 0) rotate(calc(var(--rot) * 1deg));
-    opacity: 1;
+/* Page polish: topics, quizzes, and new quiz */
+.page-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 76px 24px 56px;
+}
+
+.page-header {
+  margin-bottom: 30px;
+}
+
+.page-subtitle {
+  margin: 10px 0 0;
+  color: #5a5a5a;
+  font-size: 16px;
+}
+
+.page-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.empty-state {
+  border: 1px solid #d9d9d9;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 28px;
+  text-align: center;
+}
+
+.empty-state h2 {
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #636363;
+}
+
+button,
+.button {
+  background: #111111;
+  border: 1px solid #111111;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+  padding: 11px 18px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button:hover,
+.button:hover {
+  background: #000000;
+}
+
+.topics-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+}
+
+.topic {
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+
+.topic img {
+  width: 42px;
+  height: 42px;
+  margin-right: 14px;
+}
+
+.topic-link {
+  color: #0f0f0f;
+  text-decoration: none;
+  flex: 1;
+}
+
+.topic-container {
+  display: flex;
+  align-items: center;
+}
+
+.text-content > h2 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.text-content > p {
+  font-size: 13px;
+  color: #5c5c5c;
+}
+
+.create-new-topic-button {
+  margin: 0;
+  min-width: 190px;
+}
+
+.quizzes-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.quiz-item {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 10px 8px 14px;
+  overflow: visible;
+}
+
+.quiz {
+  font-size: 20px;
+  font-weight: 700;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  margin-bottom: 14px !important;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  overflow: visible;
+  transition: none;
+}
+
+.quiz:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.quiz-name-label {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1b1b1b;
+}
+
+.quiz-item-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.quiz-item-buttons .delete-button {
+  grid-column: span 2;
+}
+
+.play-quiz-button,
+.button-edit,
+.delete-button {
+  margin: 0;
+  background: #111111;
+  color: #ffffff;
+  border: 1px solid #111111;
+  border-radius: 10px;
+  font-size: 13px;
+  padding: 10px 14px;
+}
+
+.play-quiz-button:hover,
+.button-edit:hover,
+.delete-button:hover {
+  background: #000000;
+  border-color: #000000;
+}
+
+.modern-form {
+  max-width: 760px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.modern-form input,
+.modern-form select {
+  width: 100%;
+  max-width: none;
+  border-radius: 10px;
+  border: 1px solid #cfcfcf;
+  font-size: 14px;
+}
+
+.new-quiz-cards {
+  margin-top: 8px;
+  display: grid;
+  gap: 14px;
+}
+
+.modern-card-inputs {
+  border: 1px solid #dfdfdf;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-index {
+  margin: 0 0 4px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #4f4f4f;
+}
+
+.remove-card-button {
+  margin-top: 6px;
+  margin-left: 0;
+  position: static;
+  right: auto;
+  top: auto;
+  color: #ffffff;
+  background: #2a2a2a;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.modern-actions {
+  margin-top: 18px;
+  gap: 10px;
+}
+
+.form-help-text {
+  margin: 14px 0 0;
+  color: #6a6a6a;
+  font-size: 13px;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .page-section {
+    padding: 72px 16px 40px;
   }
-  100% {
-    transform: translate3d(calc((50 - var(--x)) * 1vw), 110vh, 0) rotate(calc(var(--rot) * 5deg));
-    opacity: 0;
+
+  .topic {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .topic .delete-button {
+    width: 100%;
+  }
+
+  .quiz-item-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .quiz-item-buttons .delete-button {
+    grid-column: span 1;
+  }
+}
+
+/* Requested tile layout for Topics and Topic detail quizzes */
+.topics-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.topic.topic-tile {
+  padding: 24px 16px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  min-height: 220px;
+}
+
+.topic-tile .topic-link {
+  width: 100%;
+}
+
+.topic-tile .topic-container {
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.topic-tile img {
+  width: 72px;
+  height: 72px;
+  margin-right: 0;
+}
+
+.topic-tile .text-content h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.topic-quiz-count {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: #666666;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.topic-tile .delete-button {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.topic-quizzes-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.topic-quiz-card {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 16px 10px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  overflow: visible;
+}
+
+.topic-quiz-link {
+  text-decoration: none;
+  color: #111111;
+  width: 100%;
+  overflow: visible;
+}
+
+.sketchfab-embed-wrapper {
+  width: 100%;
+  height: 230px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+
+.sketchfab-iframe {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  border: none;
+  border-radius: 8px;
+}
+
+.topic-quiz-name {
+  margin: 0;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f1f1f;
+}
+
+.topic-quiz-card .delete-button {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.topic-page-actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.topic-page-actions .delete-button,
+.topic-page-actions .button {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .topics-list,
+  .topic-quizzes-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .topics-list,
+  .topic-quizzes-grid {
+    grid-template-columns: 1fr;
   }
 }
